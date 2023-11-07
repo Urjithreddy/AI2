@@ -1,0 +1,9 @@
+class Hangman:
+    def __init__(self, w): self.w, self.ml, self.gl, self.b = w, [], [], ['  +---+\n  |   |\n'+s+'\n=========' for s in ['\n      \n      \n      \n      ', '  O   \n      \n      \n      ', '  O   \n  |   \n      \n      ', '  O   \n /|   \n      \n      ', '  O   \n /|\  \n      \n      ', '  O   \n /|\  \n /    \n      ', '  O   \n /|\  \n / \  \n      ']]
+    def g(self, l): getattr(self, 'gl' if l in self.w else 'ml').append(l) if l not in self.gl + self.ml else 0
+    def o(self): return set(self.w) <= set(self.gl) or len(self.ml) > 5
+    def h(self): print(self.b[len(self.ml)], f'\nWord: {" ".join("_" if c not in self.gl else c for c in self.w)}\n\nMissed: {" ".join(self.ml)}\n\nGuessed: {" ".join(self.gl)}\n')
+
+game = Hangman("Dictionary")
+while not game.o(): game.h(); game.g(input('Letter: '))
+game.h(); print('Won!' if game.o() and len(game.ml) < 6 else f'Lost! It was "{game.w}".\nNice playing!')
