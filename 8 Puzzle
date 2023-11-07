@@ -1,0 +1,42 @@
+import heapq, itertools
+
+def h(s, g): return sum(abs(b % 3 - g % 3) + abs(b // 3 - g // 3) for b, g in ((s.index(i), g.index(i)) for i in range(1, 9)))
+def n(s):
+    zero = s.index(0)
+    neighbors = []
+    if zero >= 3: neighbors.append(s[:zero-3] + (0,) + s[zero-2:zero] + (s[zero-3],) + s[zero+1:])
+    if zero < 6: neighbors.append(s[:zero] + (s[zero+3],) + s[zero+1:zero+3] + (0,) + s[zero+4:])
+    if zero % 3: neighbors.append(s[:zero-1] + (0, s[zero-1]) + s[zero+1:])
+    if zero % 3 < 2: neighbors.append(s[:zero] + (s[zero+1], 0) + s[zero+2:])
+    return neighbors
+
+def a_star(start, goal):
+    pq, g, f, c, parents = [(h(start, goal), next(c := itertools.count()), start)], {start: 0}, {start: h(start, goal)}, c, {}
+    while pq:
+        cur = heapq.heappop(pq)[-1]
+        if cur == goal: return parents
+        for m in n(cur):
+            tg = g[cur] + 1
+            if tg < g.get(m, float('inf')):
+                parents[m] = cur
+                g[m], f[m] = tg, tg + h(m, goal)
+                heapq.heappush(pq, (f[m], next(c), m))
+
+def print_puzzle(s):
+    print('\n'.join([' '.join(['{:2}'.format(i) for i in s[i:i+3]]) for i in range(0, 9, 3)]))
+
+def reconstruct_path(cur, parents):
+    path = [cur]
+    while cur in parents:
+        cur = parents[cur]
+        path.append(cur)
+    return path[::-1]
+
+start, goal = (1, 2, 5, 3, 4, 6, 7, 8, 0), (1, 2, 3, 4, 5, 6, 7, 8, 0)
+parents = a_star(start, goal)
+if parents:
+    for state in reconstruct_path(goal, parents):
+        print_puzzle(state)
+        print()
+else:
+    print("No solution found.")
